@@ -1,8 +1,17 @@
 <?php include __DIR__ . '/parts/config.php'; ?>
 
 
-<?php $title = '新增資料';
-$pageName = 'ab-insert';
+<?php $title = '修改資料';
+$pageName = 'ab-edit';
+
+$sid = intval($_GET['sid']);
+$sql = "SELECT * FROM `address_book` WHERE `sid`=$sid";
+
+$row = $pdo->query($sql)->fetch();
+if (empty($row)) {
+    header('Location:ab-list.php');
+    exit;
+}
 ?>
 
 <?php include __DIR__ . '/parts/html-header.php'; ?>
@@ -18,38 +27,41 @@ $pageName = 'ab-insert';
             <div class="card">
 
                 <div class="card-body">
-                    <h5 class="card-title">新增資料</h5>
+                    <h5 class="card-title">修改資料</h5>
 
                     <form name="form1" method="post" ovalidate onsubmit="checkForm(); return false;">
+                        <input type="hidden" name="sid" value="<?= $row['sid'] ?>">
+
                         <div class="form-group">
+
                             <label for="name">*姓名 </label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <input type="text" class="form-control" id="name" name="name" required value="<?= htmlentities($row['name']) ?>">
                             <small class="form-text error"></small>
                         </div>
                         <div class="form-group">
                             <label for="email">email </label>
-                            <input type="text" class="form-control" id="email" name="email">
+                            <input type="text" class="form-control" id="email" name="email" value="<?= htmlentities($row['email']) ?>">
                             <small class="form-text error"></small>
                         </div>
                         <div class="form-group">
                             <label for="mobile">手機 </label>
-                            <input type="text" class="form-control" id="mobile" name="mobile" pattern="09\d{8}">
+                            <input type="text" class="form-control" id="mobile" name="mobile" pattern="09\d{8}" value="<?= htmlentities($row['mobile']) ?>">
                             <small class="form-text error"></small>
                         </div>
                         <div class="form-group">
                             <label for="birthday">生日 </label>
-                            <input type="date" class="form-control" id="birthday" name="birthday">
+                            <input type="date" class="form-control" id="birthday" name="birthday" value="<?= htmlentities($row['birthday']) ?>">
 
                         </div>
                         <div class="form-group">
                             <label for="address">地址 </label>
-                            <textarea class="form-control" name="address" id="address" cols="30" rows="3"></textarea>
+                            <textarea class="form-control" name="address" id="address" cols="30" rows="3"> <?= htmlentities($row['address']) ?></textarea>
 
                         </div>
 
 
 
-                        <button type="submit" class="btn btn-primary">新增</button>
+                        <button type="submit" class="btn btn-primary">修改</button>
                     </form>
                 </div>
             </div>
@@ -98,11 +110,13 @@ $pageName = 'ab-insert';
         }
         if (isPass) {
             $.post(
-                'ab-inser-api.php',
+                'ab-edit-api.php',
                 $(document.form1).serialize(),
                 function(data) {
                     if (data.success) {
-                        alert('資料新增成功');
+                        alert('資料修改成功');
+                    } else {
+                        alert(date.error);
                     }
                 },
                 'json'
